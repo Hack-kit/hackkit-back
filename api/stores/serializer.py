@@ -23,7 +23,16 @@ class FoodSerializer(serializers.ModelSerializer):
         return super(FoodSerializer, self).update(instance, validated_data)
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderModelSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    food = FoodSerializer()
+
+    class Meta:
+        model = Order
+        fields = ['user', 'food', 'quantity']
+
+
+class OrderSerializer(serializers.Serializer):
     user = UserSerializer(read_only=False)
     food = serializers.SerializerMethodField()
     valid_order = serializers.SerializerMethodField()

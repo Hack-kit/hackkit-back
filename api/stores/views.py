@@ -10,7 +10,7 @@ from rest_framework.renderers import JSONRenderer
 from apps.users.models import User
 from api.users.serializer import LoginSerializer
 from apps.stores.models import Food, Order, Store
-from api.stores.serializer import FoodSerializer, OrderSerializer, StoreSerializer
+from api.stores.serializer import FoodSerializer, OrderSerializer, StoreSerializer, OrderModelSerializer
 
 
 class StoreView(generics.ListAPIView):
@@ -92,28 +92,22 @@ class FoodListView(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         # 하나의 food만 보여줄 것인가, food의 list를 보여줄 것인가?
-        food = self.get_object()
-        response = {
-            'pk': food.pk,
-            'food': self.serializer_class(instance=food).data
-        }
-        return Response(response, status=status.HTTP_200_OK)
+        user = LoginSerializer.get_user(request=request)
+        # 범위 필터링을 어떻게 하지????
+        return Response(None, status=status.HTTP_200_OK)
 
 
 class OrderView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.UpdateModelMixin):
     # request.body = { customer_pk, food_pk, quantity }
     permission_classes = (IsAuthenticated,)
     serializer_class = OrderSerializer
-    lookup_field = 'pk'
     queryset = Order.objects.all()
 
-    def __init__(self):
-        self.order = self.get_object()
-
     def get(self, request, *args, **kwargs):
-        # self.order
-        order_list = self.serializer_class(
-            instance=Order.objects.filter(user=request.user),
+        user = LoginSerializer.get_user(request=request)
+        order_list = OrderModelSerializer(
+            instance=self.queryset.filter(user=request.user),
+            partial=True,
             many=True
         ).data
         return Response(order_list, status=status.HTTP_200_OK)
