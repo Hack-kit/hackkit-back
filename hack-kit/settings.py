@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'apps.oauth',
     'apps.users',
     'apps.stores',
+
+    'drf_yasg',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +79,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'hack-kit.wsgi.application'
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
