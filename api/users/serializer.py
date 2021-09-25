@@ -14,7 +14,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ['text']
+        fields = ['name', 'text', 'lat', 'long']
 
 
 class LoginSerializer(serializers.Serializer):
@@ -57,9 +57,11 @@ class SignUpSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    address = AddressSerializer()
+
     class Meta:
         model = User
-        fields = ['oauth', 'email', 'phone', 'address','user_type']
+        fields = ['oauth', 'email', 'phone', 'address', 'user_type', 'username']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
