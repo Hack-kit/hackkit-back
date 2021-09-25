@@ -24,6 +24,7 @@ with open(secret_file) as f:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secrets['SECRET_KEY']
 GOOGLE = secrets['GOOGLE']
+KAKAO = secrets['KAKAO']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
