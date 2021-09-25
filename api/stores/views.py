@@ -4,14 +4,34 @@ from rest_framework import generics, mixins, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
 
-from apps.stores.models import Food, Order
-from api.stores.serializer import FoodSerializer, OrderSerializer
+from apps.users.models import User
+from api.users.serializer import LoginSerializer
+from apps.stores.models import Food, Order, Store
+from api.stores.serializer import FoodSerializer, OrderSerializer, StoreSerializer
 
 
-# class StoreView(generics.ListAPIView):
-#     serializer_class = None
-#     pass
+class StoreView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = StoreSerializer
+    queryset = Store.objects.all().prefetch_related('food_set')
+    lookup_field = 'pk'
+    lookup_url_kwarg = lookup_field
+
+    def get(self, request, *args, **kwargs):
+        user = LoginSerializer.get_user(request=request)
+        user_type = User.objects.get(id=user.id).user_type
+        if user_type == User.USER_CHOICES.owner:
+            store = self.queryset.get(owner=user)
+            food_set = FoodSerializer(instance=store.food_set.all(), many=True).data
+            # print(FoodSerializer(instance=food_set, many=True).data)
+            response = {
+                'store_food_set': json.loads(JSONRenderer().render(data=food_set))
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response({'고객 객체에서는 가게를 조회할 수 없습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class FoodView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):

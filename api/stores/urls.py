@@ -4,7 +4,7 @@ from api.stores.views import *
 
 app_name = 'stores'
 urlpatterns = [
-    # path('<int:pk>', StoreView.as_view(), name='store'),
+    path('', StoreView.as_view(), name='store'),
     path('food', FoodView.as_view(), name='food'),
     path('food/create', FoodView.as_view(), name='food_create'),          # POST
     path('food/<int:pk>/edit', FoodView.as_view(), name='food_edit'),

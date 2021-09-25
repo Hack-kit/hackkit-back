@@ -31,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
         return user
 
     @staticmethod
-    def get_auth_user(obj: OAuth):
+    def get_auth_user(obj: OAuth) -> typing.Optional[User]:
         try:
             return User.objects.get(oauth_id=obj.id)
         except User.DoesNotExist:

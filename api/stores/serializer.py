@@ -1,9 +1,16 @@
 import typing
 from rest_framework import serializers
+from rest_framework.request import Request
 from rest_framework.exceptions import ValidationError
 
-from apps.stores.models import Food, Order
+from apps.stores.models import Food, Order, Store
 from api.users.serializer import UserSerializer
+
+
+class StoreSerializer(serializers.Serializer):
+    class Meta:
+        model = Store
+        fields = ['owner']
 
 
 class FoodSerializer(serializers.ModelSerializer):
