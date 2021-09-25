@@ -33,7 +33,9 @@ class Address(models.Model):
         max_length=50,
         verbose_name='가게명'
     )
-    # location = PointField
+    text = models.TextField(default='')
+    lat = models.FloatField(null=True, blank=True)
+    long = models.FloatField(null=True, blank=True)
 
 
 class User(AbstractUser):
@@ -48,6 +50,12 @@ class User(AbstractUser):
         blank=True,
         verbose_name='oauth'
     )
+    username = models.CharField(
+        unique=False,
+        null=True,
+        blank=True,
+        max_length=10
+    )
     email = models.EmailField(
         unique=True,
         max_length=255,
@@ -57,6 +65,8 @@ class User(AbstractUser):
     address = models.OneToOneField(
         'Address',
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         verbose_name='주소'
     )
     user_type = models.CharField(
@@ -69,6 +79,12 @@ class User(AbstractUser):
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    def has_perm(self, perm, obj=None):
+        return self.is_staff
+
+    def has_module_perms(self, app_label):
+        return True
 
 
 class Review(models.Model):

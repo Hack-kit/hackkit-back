@@ -9,8 +9,9 @@ from apps.stores.models import Food, Order
 from api.stores.serializer import FoodSerializer, OrderSerializer
 
 
-class StoreView(generics.ListAPIView):
-    pass
+# class StoreView(generics.ListAPIView):
+#     serializer_class = None
+#     pass
 
 
 class FoodView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
