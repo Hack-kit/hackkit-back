@@ -18,6 +18,10 @@ class FoodSerializer(serializers.ModelSerializer):
         model = Food
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        instance.description = validated_data.get('', instance.description)
+        return super(FoodSerializer, self).update(instance, validated_data)
+
 
 class OrderSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=False)
