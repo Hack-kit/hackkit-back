@@ -12,3 +12,4 @@ venv/
 .env
 secret.json
 static/*
+media/*
