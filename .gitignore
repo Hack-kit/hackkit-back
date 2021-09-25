@@ -10,5 +10,5 @@ myvenv/
 .idea
 venv/
 .env
-secret_key.json
+secret.json
 static/*
