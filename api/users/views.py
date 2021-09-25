@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.oauth.models import OAuth
 from apps.users.models import User, Review, Address
-from api.users.serializer import UserSerializer, ReviewSerializer, LoginSerializer, SignUpSerializer
+from api.users.serializer import UserSerializer, ReviewSerializer, LoginSerializer, SignUpSerializer, AddressSerializer
 from api.users.services import AddressService
 
 
@@ -44,7 +44,6 @@ class SignUpView(generics.CreateAPIView):
             print(lat)
             print(long)
             address = Address.objects.create(
-                name=data['nickname'],
                 text=data['address']['text'],
                 lat=lat,
                 long=long
@@ -56,11 +55,16 @@ class SignUpView(generics.CreateAPIView):
                 address=address,
                 user_type=data['user_type']
             )
+            if data['user_type'] == User.USER_CHOICES.owner:
+                address.name = data['nickname']
+            else:
+                user.username = data['nickname']
             user.save()
             print(user)
             response = {
                 'pk': user.pk,
                 'user': UserSerializer(instance=user).data,
+                # 'address': AddressSerializer(instance=address).data,
                 'token': LoginSerializer.get_token(user=user)
             }
             print(response)
