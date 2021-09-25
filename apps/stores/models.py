@@ -1,7 +1,39 @@
+import os
 from django.db import models
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from model_utils import Choices
+
+
+def set_receipt_img_path(instance, filename):
+    Model = instance.__class__
+    try:
+        pk = Food.objects.order_by("pk").last().pk
+        if pk:
+            pk += 1
+        else:
+            pass
+    except Food.DoesNotExist:
+        new_id = 1
+    ext = os.path.splitext(filename)[-1].lower()
+    file_path ='receipt/{0}_영수증{1}'.format(pk, ext)
+    return file_path
+
+
+def set_food_img_path(instance, filename):
+    Model = instance.__class__
+    try:
+        pk = Food.objects.order_by("pk").last().pk
+        if pk:
+            pk += 1
+        else:
+            pass
+    except Food.DoesNotExist:
+        new_id = 1
+    ext = os.path.splitext(filename)[-1].lower()
+    file_path ='foods/{0}_음식{1}'.format(pk, ext)
+    return file_path
 
 
 class Store(models.Model):
@@ -25,12 +57,18 @@ class Food(models.Model):
         on_delete=models.CASCADE,
         verbose_name='가게명'
     )
-    receipt = models.ImageField()
+    receipt = models.ImageField(
+        upload_to=set_receipt_img_path,
+        verbose_name='영수증'
+    )
     name = models.CharField(
         max_length=50,
         verbose_name='식자재명'
     )
-    food_img = models.ImageField()
+    food_img = models.ImageField(
+        upload_to=set_food_img_path,
+        verbose_name='식자재 사진'
+    )
     category = models.CharField(
         choices=CATEGORY_CHOICES,
         default=CATEGORY_CHOICES.etc,
