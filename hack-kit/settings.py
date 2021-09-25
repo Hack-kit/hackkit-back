@@ -36,7 +36,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'http://ec2-13-125-39-83.ap-northeast-2.compute.amazonaws.com:8000/'
+    'ec2-13-125-39-83.ap-northeast-2.compute.amazonaws.com'
 ]
 
 # Application definition
