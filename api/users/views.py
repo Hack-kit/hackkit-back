@@ -4,7 +4,7 @@ from django.db import transaction
 from django.forms import model_to_dict
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from apps.oauth.models import OAuth
 from apps.users.models import User, Review, Address
@@ -13,11 +13,20 @@ from api.users.services import AddressService
 
 
 class LoginView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        user = self.serializer_class.get_user(request=request)
+        data = json.loads(request.body)
+        try:
+            auth = OAuth.objects.get(
+                type=OAuth.OAUTH_CHOICES.Google,
+                token=data['google_id']
+            )
+        except OAuth.DoesNotExist:
+            return Response({'not our user'}, status=status.HTTP_404_NOT_FOUND)
+
+        user = self.serializer_class.get_auth_user(obj=auth)
         if user:
             response = {
                 'user': UserSerializer(instance=user).data,
