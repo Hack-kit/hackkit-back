@@ -7,13 +7,13 @@ class OAuth(models.Model):
         ('Google', 'google'),
         ('default', 'default')
     )
-    oauth_type = models.CharField(
+    type = models.CharField(
         choices=OAUTH_CHOICES,
         default=OAUTH_CHOICES.default,
         max_length=10,
         verbose_name='OAuth_Type'
     )
-    oauth_token = models.CharField(
+    token = models.CharField(
         db_index=True,
         max_length=255,
         default='',
