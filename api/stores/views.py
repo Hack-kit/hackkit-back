@@ -1,14 +1,14 @@
-import json
+import json, datetime
 
 from django.forms import model_to_dict
 from rest_framework import generics, mixins, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.renderers import JSONRenderer
 
 from apps.users.models import User
-from api.users.serializer import LoginSerializer
+from api.users.serializer import LoginSerializer, UserSerializer
 from apps.stores.models import Food, Order, Store
 from api.stores.serializer import FoodSerializer, OrderSerializer, StoreSerializer, OrderModelSerializer
 
@@ -44,8 +44,24 @@ class FoodView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.UpdateMo
 
     # 사진 넣는 부분 해결할것!
     def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        food_serializer = self.serializer_class(data=data)
+        user = LoginSerializer.get_user(request=request)
+        data = json.loads(request.POST['data'])
+        try:
+            store = Store.objects.get(owner=user)
+        except Store.DoesNotExist:
+            return Response({'가게 객체를 조회할 수 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
+
+        food = Food(
+            store=store,
+            receipt=request.FILES['receipt'],
+            name=data['name'],
+            food_img=request.FILES['food_img'],
+            category=data['category'],
+            description=data['description'],
+            quantity=data['quantity'],
+            closed_at=datetime.datetime.strptime(data['closed_at'], '%Y-%m-%d %H:%M')
+        )
+        food_serializer = self.serializer_class(data=model_to_dict(food))
         food_serializer.is_valid(raise_exception=True)
         food = food_serializer.save()
         response = {
@@ -89,12 +105,19 @@ class FoodView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.UpdateMo
 
 
 class FoodListView(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = FoodSerializer
+    queryset = Food.objects.all()
 
     def get(self, request, *args, **kwargs):
         # 하나의 food만 보여줄 것인가, food의 list를 보여줄 것인가?
         user = LoginSerializer.get_user(request=request)
-        # 범위 필터링을 어떻게 하지????
-        return Response(None, status=status.HTTP_200_OK)
+        food_set = self.serializer_class(instance=self.get_queryset(), many=True).data
+        response = {
+            'user': UserSerializer(instance=user).data,
+            'foods': json.loads(JSONRenderer().render(data=food_set))
+        }
+        return Response(response, status=status.HTTP_200_OK)
 
 
 class OrderView(generics.GenericAPIView, mixins.CreateModelMixin, mixins.UpdateModelMixin):

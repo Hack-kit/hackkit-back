@@ -11,7 +11,7 @@ urlpatterns = [
     path('food/<int:pk>/delete', FoodView.as_view(), name='food_edit'),
 
     # customer_side
-    path('food', FoodListView.as_view(), name='food'),
+    path('food', FoodListView.as_view(), name='food_list'),
     path('order', OrderView.as_view(), name='order_list'),
     path('order/create', OrderView.as_view(), name='order'),
     path('order/<int:pk>/edit', OrderView.as_view(), name='order_edit'),
